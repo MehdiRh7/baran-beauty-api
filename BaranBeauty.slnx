@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/BaranBeauty.Api/BaranBeauty.Api.csproj" />
+    <Project Path="src/BaranBeauty.Application/BaranBeauty.Application.csproj" />
+    <Project Path="src/BaranBeauty.Domain/BaranBeauty.Domain.csproj" />
+    <Project Path="src/BaranBeauty.Infrastructure/BaranBeauty.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/BaranBeauty.Application.Tests/BaranBeauty.Application.Tests.csproj" />
+  </Folder>
+</Solution>

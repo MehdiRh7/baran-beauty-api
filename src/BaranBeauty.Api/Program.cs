@@ -1,0 +1,20 @@
+using System.Text;
+using BaranBeauty.Api;
+using BaranBeauty.Domain;
+using BaranBeauty.Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+
+var builder=WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();builder.Services.AddOpenApi();builder.Services.AddProblemDetails();
+builder.Services.AddApplication().AddInfrastructure(builder.Configuration,builder.Environment.ContentRootPath);
+builder.Services.AddCors(o=>o.AddPolicy("Frontend",p=>p.WithOrigins(builder.Configuration.GetSection("AllowedOrigins").Get<string[]>()??["http://localhost:5173"]).AllowAnyHeader().AllowAnyMethod()));
+var jwt=builder.Configuration.GetSection("Jwt");var key=jwt["Key"]??throw new InvalidOperationException("Jwt:Key is missing.");
+builder.Services.AddSingleton<IJwtTokenFactory>(new JwtTokenFactory(key,jwt["Issuer"]!,jwt["Audience"]!,int.Parse(jwt["ExpirationMinutes"]??"120")));
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o=>o.TokenValidationParameters=new TokenValidationParameters{ValidateIssuer=true,ValidateAudience=true,ValidateLifetime=true,ValidateIssuerSigningKey=true,ValidIssuer=jwt["Issuer"],ValidAudience=jwt["Audience"],IssuerSigningKey=new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),ClockSkew=TimeSpan.FromMinutes(1)});
+builder.Services.AddAuthorization();
+var app=builder.Build();app.UseExceptionHandler();if(app.Environment.IsDevelopment())app.MapOpenApi();app.UseStaticFiles();app.UseCors("Frontend");app.UseAuthentication();app.UseAuthorization();app.MapControllers();
+using(var scope=app.Services.CreateScope())await DatabaseSeeder.SeedAsync(scope.ServiceProvider.GetRequiredService<BaranDbContext>(),scope.ServiceProvider.GetRequiredService<IPasswordHasher<AdminUser>>());
+app.Run();
+public partial class Program;
