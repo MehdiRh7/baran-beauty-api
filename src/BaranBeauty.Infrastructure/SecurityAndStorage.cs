@@ -33,12 +33,6 @@ public static class DatabaseSeeder
     {
         await db.Database.EnsureCreatedAsync(ct);
         if(!await db.AdminUsers.AnyAsync(ct)){var placeholder=new AdminUser("admin","pending","مدیر سالن باران");var hash=hasher.HashPassword(placeholder,"Baran@1405");db.AdminUsers.Add(new AdminUser("admin",hash,"مدیر سالن باران"));}
-        if(!await db.Services.AnyAsync(ct))db.Services.AddRange(
-            new BeautyService("رنگ و لایت تخصصی","ترکیب رنگ اختصاصی متناسب با چهره و سبک شما",2800000,180,"sparkles"),
-            new BeautyService("میکاپ و گریم","میکاپ حرفه‌ای و ماندگار برای لحظه‌های خاص",2200000,90,"heart"),
-            new BeautyService("کوتاهی و استایل","فرم‌دهی حرفه‌ای مو با تکنیک‌های روز",750000,60,"scissors"),
-            new BeautyService("خدمات ناخن","مانیکور، پدیکور و طراحی با متریال ممتاز",550000,75,"star"));
-        if(!await db.SalonProfiles.AnyAsync(ct))db.SalonProfiles.Add(new SalonProfile("سالن زیبایی باران","۰۲۱-۲۲۳۳ ۴۴۵۵","۰۹۱۲-۱۲۳ ۴۵۶۷","تهران، پاسداران، بوستان هشتم، پلاک ۲۴","فضایی برای آرامش، زیبایی و درخشش تو.",new TimeOnly(9,0),new TimeOnly(20,0)));
         await db.SaveChangesAsync(ct);
     }
 }

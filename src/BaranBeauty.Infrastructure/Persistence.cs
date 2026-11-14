@@ -14,6 +14,7 @@ public sealed class BaranDbContext(DbContextOptions<BaranDbContext> options) : D
     public DbSet<MediaAsset> Media => Set<MediaAsset>();
     public DbSet<SalonProfile> SalonProfiles => Set<SalonProfile>();
     public DbSet<AdminUser> AdminUsers => Set<AdminUser>();
+    public DbSet<SmsSettings> SmsSettings => Set<SmsSettings>();
     protected override void OnModelCreating(ModelBuilder b)
     {
         b.Entity<BeautyService>().Property(x=>x.StartingPrice).HasPrecision(18,2);

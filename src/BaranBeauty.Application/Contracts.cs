@@ -42,6 +42,15 @@ public sealed record CertificateDto(Guid Id, string Title, string Issuer, string
 public sealed record MediaDto(Guid Id, string Name, string Url, string Type, string Section);
 public sealed record SalonProfileRequest(string Name, string Phone, string Mobile, string Address, string About, TimeOnly OpensAt, TimeOnly ClosesAt);
 public sealed record SalonProfileDto(Guid Id, string Name, string Phone, string Mobile, string Address, string About, TimeOnly OpensAt, TimeOnly ClosesAt);
+public sealed record SmsSettingsRequest(string AdminMobile, string? ApiKey, string Sender, bool IsEnabled, string CustomerTemplate, string ManagerTemplate);
+public sealed record SmsSettingsDto(string AdminMobile, string Sender, bool IsEnabled, bool HasApiKey, string CustomerTemplate, string ManagerTemplate);
+public interface ISmsSettingsService
+{
+    Task<SmsSettingsDto> GetAsync(CancellationToken ct);
+    Task<SmsSettingsDto> SaveAsync(SmsSettingsRequest request, CancellationToken ct);
+    Task SendTestAsync(string receptor, CancellationToken ct);
+}
+public interface IAppointmentNotifier { Task NotifyCreatedAsync(Appointment appointment, BeautyService service, CancellationToken ct); }
 
 public interface ISalonContentService
 {

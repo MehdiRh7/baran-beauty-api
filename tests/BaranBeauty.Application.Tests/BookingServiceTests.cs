@@ -17,7 +17,7 @@ public sealed class BookingServiceTests
         var service=new BeautyService("رنگ مو","توضیحات",100_000,60,"sparkles");
         services.GetAsync(service.Id,Arg.Any<CancellationToken>()).Returns(service);
         queries.IsBlockedAsync(Arg.Any<DateOnly>(),Arg.Any<CancellationToken>()).Returns(true);
-        var sut=new BookingService(appointments,services,blocked,queries,uow);
+        var sut=new BookingService(appointments,services,blocked,queries,uow,Substitute.For<IAppointmentNotifier>());
         var request=new AppointmentRequest(service.Id,"کاربر","09120000000",DateTime.Now.AddDays(2),null);
 
         await Assert.ThrowsAsync<InvalidOperationException>(()=>sut.CreateAsync(request,CancellationToken.None));

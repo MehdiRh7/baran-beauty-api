@@ -120,3 +120,18 @@ public sealed class AdminUser : Entity
     public string PasswordHash { get; private set; } = string.Empty;
     public string DisplayName { get; private set; } = string.Empty;
 }
+
+public sealed class SmsSettings : Entity
+{
+    private SmsSettings() { }
+    public SmsSettings(string adminMobile, string protectedApiKey, string sender, bool enabled, string customerTemplate, string managerTemplate)
+        => Update(adminMobile, protectedApiKey, sender, enabled, customerTemplate, managerTemplate);
+    public string AdminMobile { get; private set; } = string.Empty;
+    public string ProtectedApiKey { get; private set; } = string.Empty;
+    public string Sender { get; private set; } = string.Empty;
+    public bool IsEnabled { get; private set; }
+    public string CustomerTemplate { get; private set; } = string.Empty;
+    public string ManagerTemplate { get; private set; } = string.Empty;
+    public void Update(string adminMobile, string protectedApiKey, string sender, bool enabled, string customerTemplate, string managerTemplate)
+    { AdminMobile=adminMobile.Trim(); ProtectedApiKey=protectedApiKey; Sender=sender.Trim(); IsEnabled=enabled; CustomerTemplate=customerTemplate.Trim(); ManagerTemplate=managerTemplate.Trim(); Touch(); }
+}

@@ -29,10 +29,10 @@ public sealed class SalonContentService(
     private static SalonProfileDto Map(SalonProfile x)=>new(x.Id,x.Name,x.Phone,x.Mobile,x.Address,x.About,x.OpensAt,x.ClosesAt);
 }
 
-public sealed class BookingService(IRepository<Appointment> appointments,IRepository<BeautyService> services,IRepository<BlockedDate> blocked,IAppointmentQueries queries,IUnitOfWork uow):IBookingService
+public sealed class BookingService(IRepository<Appointment> appointments,IRepository<BeautyService> services,IRepository<BlockedDate> blocked,IAppointmentQueries queries,IUnitOfWork uow,IAppointmentNotifier notifier):IBookingService
 {
     public async Task<AppointmentDto> CreateAsync(AppointmentRequest r,CancellationToken ct)
-    { var service=await services.GetAsync(r.ServiceId,ct)??throw new KeyNotFoundException("خدمت یافت نشد.");var date=DateOnly.FromDateTime(r.StartsAt);if(await queries.IsBlockedAsync(date,ct)||r.StartsAt.DayOfWeek==DayOfWeek.Friday)throw new InvalidOperationException("این روز قابل رزرو نیست.");if(await queries.SlotExistsAsync(r.StartsAt,ct))throw new InvalidOperationException("این ساعت قبلاً رزرو شده است.");var e=new Appointment(r.ServiceId,r.CustomerName,r.Mobile,r.StartsAt,r.Notes);await appointments.AddAsync(e,ct);await uow.SaveChangesAsync(ct);return Map(e,service.Title);}
+    { var service=await services.GetAsync(r.ServiceId,ct)??throw new KeyNotFoundException("خدمت یافت نشد.");var date=DateOnly.FromDateTime(r.StartsAt);if(await queries.IsBlockedAsync(date,ct)||r.StartsAt.DayOfWeek==DayOfWeek.Friday)throw new InvalidOperationException("این روز قابل رزرو نیست.");if(await queries.SlotExistsAsync(r.StartsAt,ct))throw new InvalidOperationException("این ساعت قبلاً رزرو شده است.");var e=new Appointment(r.ServiceId,r.CustomerName,r.Mobile,r.StartsAt,r.Notes);await appointments.AddAsync(e,ct);await uow.SaveChangesAsync(ct);await notifier.NotifyCreatedAsync(e,service,ct);return Map(e,service.Title);}
     public async Task<IReadOnlyList<AppointmentDto>> ListAsync(CancellationToken ct)=>(await queries.ListDetailedAsync(ct)).Select(x=>Map(x,x.Service?.Title??string.Empty)).ToList();
     public async Task ChangeStatusAsync(Guid id,AppointmentStatus status,CancellationToken ct){var e=await appointments.GetAsync(id,ct)??throw new KeyNotFoundException();e.ChangeStatus(status);await uow.SaveChangesAsync(ct);}
     public Task<IReadOnlyList<BlockedDate>> GetBlockedDatesAsync(CancellationToken ct)=>blocked.ListAsync(ct);
